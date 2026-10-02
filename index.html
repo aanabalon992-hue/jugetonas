@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUGETONAS - Sex Shop Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ANIMACIÓN DE ENTRADA -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <p class="loader-text">JUGETONAS</p>
+            <div class="loader-bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASISTENTE DE IA -->
+    <div class="asistente-flotante" id="asistente-flotante">
+        <button class="btn-asistente" onclick="toggleAsistente()">🤖</button>
+        <div class="chat-asistente" id="chat-asistente" style="display: none;">
+            <div class="chat-header">
+                <h3>Asistente Admin</h3>
+                <button onclick="toggleAsistente()" class="btn-cerrar-chat">✕</button>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Pregunta qué cambiar..." class="chat-input">
+                <button onclick="enviarMensajeAsistente()" class="btn-enviar">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN ADMIN -->
+    <button class="btn-admin-flotante" onclick="abrirLogin()" title="Panel de Administrador">⚙️ ADMIN</button>
+
+    <!-- LOGIN ADMIN -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-container">
+            <div class="logo-login">🔐 ADMIN JUGETONAS</div>
+            <input type="password" id="password-input" placeholder="Ingresa contraseña" class="login-input">
+            <button onclick="verificarContraseña()" class="btn-login">Entrar</button>
+            <button onclick="cerrarLogin()" class="btn-cerrar-login">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- PANEL ADMIN -->
+    <div class="admin-panel" id="admin-panel">
+
+        <div class="admin-tabs">
+            <button class="tab-btn tab-destacado active" onclick="mostrarTab('tab-logo')">🖼️ LOGO</button>
+            <button class="tab-btn tab-destacado tab-destacado2" onclick="mostrarTab('tab-productos')">📦 PRODUCTOS</button>
+            <button class="tab-btn" onclick="mostrarTab('tab-editar')">✏️ Editar Sitio</button>
+            <button class="tab-btn" onclick="mostrarTab('tab-permisos')">🔐 Permisos</button>
+            <button class="tab-btn" onclick="mostrarTab('tab-config')">⚙️ Config</button>
+            <button class="tab-btn" onclick="mostrarTab('tab-diseño')">🎨 Diseño</button>
+            <button class="tab-btn tab-destacado" onclick="mostrarTab('tab-ventas')">📊 VENTAS</button>
+            <button class="tab-btn btn-cerrar-tab" onclick="cerrarAdmin()">✕ Cerrar panel</button>
+        </div>
+
+        <!-- TAB PRODUCTOS -->
+        <div id="tab-productos" class="admin-tab">
+            <h2>📦 Productos de la Tienda</h2>
+            <p class="info-texto" style="font-size:1.05rem;">Agregá productos con foto o emoji, elegí su animación, y editá o borrá los que ya tenés.</p>
+            <div class="form-producto">
+                <input type="text" id="prod-nombre" placeholder="Nombre del producto" class="admin-input">
+                <input type="text" inputmode="decimal" id="prod-precio" placeholder="Precio base (ej: 1500 o 1500,50)" class="admin-input">
+                <div class="opciones-producto">
+                    <label><input type="radio" name="tipo-imagen" value="emoji" checked> Usar Emoji</label>
+                    <label><input type="radio" name="tipo-imagen" value="foto"> Subir Foto</label>
+                </div>
+                <input type="text" id="prod-emoji" placeholder="Emoji" value="💜" class="admin-input">
+                <div class="upload-foto" style="display: none;" id="upload-foto-div">
+                    <label>📸 Subir Foto:</label>
+                    <input type="file" id="prod-foto" accept="image/*" class="admin-input">
+                    <div id="preview-foto" class="preview-foto"></div>
+                </div>
+                <textarea id="prod-desc" placeholder="Descripción" class="admin-input"></textarea>
+                
+                <div class="opciones-animacion">
+                    <label>Animación del producto:</label>
+                    <select id="prod-animacion" class="admin-input">
+                        <option value="bounce-fuego">Bounce Fuego</option>
+                        <option value="spin-rotacion">Spin Rotación</option>
+                        <option value="pulse-latido">Pulse Latido</option>
+                        <option value="swing-columpio">Swing Columpio</option>
+                        <option value="shake-vibración">Shake Vibración</option>
+                        <option value="glow-brillo">Glow Brillo</option>
+                    </select>
+                </div>
+
+                <button onclick="agregarProductoAdmin()" class="btn-admin">➕ Agregar</button>
+            </div>
+            <h3>Productos Registrados</h3>
+            <div id="lista-productos-admin" class="lista-productos-admin"></div>
+        </div>
+
+        <!-- TAB PERMISOS -->
+        <div id="tab-permisos" class="admin-tab">
+            <h2>Control de Permisos</h2>
+            <div class="permiso-box">
+                <h3>Permitir compras a visitantes</h3>
+                <div class="toggle-permiso">
+                    <label class="switch">
+                        <input type="checkbox" id="permiso-visitantes" onchange="cambiarPermiso()">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="estado-permiso" class="estado-texto">❌ BLOQUEADO</span>
+                </div>
+                <p class="permiso-info">✅ ACTIVADO = Visitantes pueden comprar</p>
+                <p class="permiso-info">❌ BLOQUEADO = Sitio en mantenimiento</p>
+            </div>
+        </div>
+
+        <!-- TAB CONFIGURACIÓN -->
+        <div id="tab-config" class="admin-tab">
+            <h2>Configuración</h2>
+            
+            <div class="config-section">
+                <h3>Contacto</h3>
+                <input type="text" id="config-whatsapp" placeholder="WhatsApp" value="2996373515" class="admin-input">
+                <input type="text" id="config-mercadopago" placeholder="Alias MP" value="tomas.112504mp" class="admin-input">
+                <input type="text" id="config-linkpago" placeholder="Link de pago de Mercado Pago (https://...)" class="admin-input">
+                <p class="info-texto">Creá el link en Mercado Pago → Cobrar → Link de pago. Es lo que usan los clientes para pagar con tarjeta.</p>
+                <button onclick="guardarContacto()" class="btn-admin">Guardar</button>
+            </div>
+
+            <div class="config-section">
+                <h3>Porcentaje Markup (%)</h3>
+                <p class="info-texto">Aumenta automáticamente precios</p>
+                <input type="number" id="config-markup" placeholder="Ej: 20" min="0" max="500" step="0.1" class="admin-input">
+                <button onclick="cambiarMarkup()" class="btn-admin">Aplicar Markup</button>
+                <p id="markup-info" class="markup-info"></p>
+            </div>
+        </div>
+
+        <!-- TAB DISEÑO -->
+        <div id="tab-diseño" class="admin-tab">
+            <h2>Diseño y Personalización</h2>
+            
+            <div class="config-section">
+                <h3>🎨 Personalizar Colores</h3>
+                <label>Color Principal (Neón):</label>
+                <input type="color" id="color-principal" value="#ff1493" class="admin-input color-picker">
+                <label>Color Secundario (Neón):</label>
+                <input type="color" id="color-secundario" value="#00ffff" class="admin-input color-picker">
+                <button onclick="cambiarColores()" class="btn-admin">Aplicar Colores</button>
+            </div>
+
+            <div class="config-section">
+                <h3>🖼️ Personalizar Fondo</h3>
+                <div class="opciones-fondo">
+                    <label><input type="radio" name="tipo-fondo" value="degradado" checked> Degradado</label>
+                    <label><input type="radio" name="tipo-fondo" value="imagen"> Imagen</label>
+                </div>
+                
+                <div id="opciones-degradado" class="opciones-fondo-config">
+                    <label>Color 1:</label>
+                    <input type="color" id="fondo-color1" value="#0a0a0a" class="admin-input color-picker">
+                    <label>Color 2:</label>
+                    <input type="color" id="fondo-color2" value="#2a0a3e" class="admin-input color-picker">
+                </div>
+
+                <div id="opciones-imagen" class="opciones-fondo-config" style="display: none;">
+                    <label>Subir imagen de fondo:</label>
+                    <input type="file" id="fondo-imagen" accept="image/*" class="admin-input">
+                    <label>Opacidad (0-100):</label>
+                    <input type="number" id="fondo-opacidad" min="0" max="100" value="50" class="admin-input">
+                    <div id="preview-fondo" class="preview-foto"></div>
+                </div>
+
+                <button onclick="cambiarFondo()" class="btn-admin">Aplicar Fondo</button>
+            </div>
+        </div>
+
+        <!-- TAB LOGO -->
+        <div id="tab-logo" class="admin-tab active">
+            <h2>🖼️ Cambiar el Logo de la Tienda</h2>
+            <p class="info-texto" style="font-size:1.05rem;">1) Elegí tu imagen &nbsp;→&nbsp; 2) Se pone sola en el sitio &nbsp;→&nbsp; 3) Ajustá el tamaño si querés.</p>
+            <div class="config-section">
+                <h3>📸 Logo de la Tienda</h3>
+                <p class="info-texto">Sube una imagen y los colores del sitio se ajustarán automáticamente</p>
+                <input type="file" id="config-logo-img" accept="image/*" class="admin-input">
+                <label style="display:flex; gap:.5rem; align-items:center; cursor:pointer;"><input type="checkbox" id="logo-adaptar" checked> Adaptar los colores y el fondo del sitio a este logo</label>
+                <div id="preview-logo" class="preview-foto"></div>
+                <label>Tamaño del logo en el sitio:</label>
+                <input type="range" id="logo-tamano" min="30" max="250" value="100" oninput="cambiarTamanoLogo(this.value)" style="width:100%; margin-bottom:1rem;">
+                <button onclick="cambiarLogo()" class="btn-admin">🎨 Adaptar colores al logo</button>
+                <button onclick="quitarLogo()" class="btn-admin" style="background:#c91432; color:#fff;">Quitar Logo</button>
+                <p id="color-info" class="markup-info"></p>
+            </div>
+
+            
+        </div>
+
+        <!-- TAB EDITAR SITIO -->
+        <div id="tab-editar" class="admin-tab">
+            <h2>✏️ Editar textos del sitio</h2>
+            <div class="config-section">
+                <label>Nombre de la tienda (junto al logo):</label>
+                <input type="text" id="ed-tienda" class="admin-input">
+                <label>Emoji del logo (si no hay imagen):</label>
+                <input type="text" id="ed-emoji" class="admin-input">
+                <label>Título principal:</label>
+                <input type="text" id="ed-titulo" class="admin-input">
+                <label>Subtítulo:</label>
+                <input type="text" id="ed-subtitulo" class="admin-input">
+                <label>Texto del botón principal:</label>
+                <input type="text" id="ed-boton" class="admin-input">
+                <label>Título de la sección productos:</label>
+                <input type="text" id="ed-tprod" class="admin-input">
+                <label>Título de contacto:</label>
+                <input type="text" id="ed-tcont" class="admin-input">
+                <label>Texto de contacto:</label>
+                <input type="text" id="ed-xcont" class="admin-input">
+                <label>Texto del pie de página:</label>
+                <input type="text" id="ed-footer" class="admin-input">
+                <button onclick="guardarTextos()" class="btn-admin">💾 Guardar cambios</button>
+            </div>
+            <p class="info-texto">Para editar un producto (nombre, precio, descripción) andá a 📦 Productos y tocá ✏️ Editar.</p>
+        </div>
+
+        <!-- TAB VENTAS -->
+        <div id="tab-ventas" class="admin-tab">
+            <h2>📊 Historial de Ventas</h2>
+            <div class="ventas-info">
+                <div class="stat-box">
+                    <h3>Total Ventas</h3>
+                    <p id="total-ventas-cantidad" class="stat-numero">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Ingresos Totales</h3>
+                    <p id="total-ventas-dinero" class="stat-numero">$0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Producto Más Vendido</h3>
+                    <p id="producto-top" class="stat-numero">-</p>
+                </div>
+            </div>
+
+            <div class="ventas-filtros">
+                <input type="text" id="filtro-ventas" placeholder="Buscar por nombre o método de pago..." class="admin-input">
+                <button onclick="filtrarVentas()" class="btn-admin">Filtrar</button>
+                <button onclick="if(typeof cargarVentasNube==='function') cargarVentasNube()" class="btn-admin">🔄 Actualizar</button>
+                <button onclick="descargarVentas()" class="btn-admin">📥 Descargar CSV</button>
+            </div>
+
+            <div class="tabla-ventas">
+                <table id="tabla-ventas">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nombre Cliente</th>
+                            <th>Productos</th>
+                            <th>Total</th>
+                            <th>Método Pago</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-ventas">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #b0b0b0;">No hay ventas registradas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <nav>
+            <div class="logo" id="logo-header">
+                <img id="logo-img" src="" style="display: none; object-fit: contain; max-width: 220px;">
+                <span id="logo-texto">💋 JUGETONAS</span>
+            </div>
+            <ul>
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#productos">Productos</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+                <li><a href="#" class="carrito-icon" onclick="mostrarCarrito(); return false;">🛒 (<span id="carrito-count">0</span>)</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <h1 class="titulo-hero">JUGETONAS</h1>
+            <p>Tu tienda online de confianza. Discreto, seguro y de calidad.</p>
+            <button class="btn" onclick="document.getElementById('productos').scrollIntoView({behavior: 'smooth'})">Explorar</button>
+        </div>
+    </section>
+
+    <!-- MANTENIMIENTO -->
+    <div class="mantenimiento-overlay" id="mantenimiento-overlay">
+        <div class="mantenimiento-box">
+            <h2>🔧 Sitio en Mantenimiento</h2>
+            <p>Estamos preparando sorpresas para ti.</p>
+            <p>📞 <a href="tel:+5492996373515">+54 9 2996373515</a></p>
+        </div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <section class="productos" id="productos">
+        <h2>Nuestros Productos</h2>
+        <div class="grid-productos" id="grid-productos"></div>
+        <div id="sin-productos" class="sin-productos">
+            <p>No hay productos disponibles aún.</p>
+        </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section class="contacto" id="contacto">
+        <div class="contacto-content">
+            <h2>¡Contáctanos!</h2>
+            <p>¿Preguntas? Estamos aquí para ayudarte.</p>
+            <div class="contacto-botones">
+                <a href="tel:+5492996373515" class="btn-contacto">📞 Llamar</a>
+                <a href="https://wa.me/5492996373515" target="_blank" class="btn-contacto">💬 WhatsApp</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CARRITO -->
+    <div class="modal" id="carrito-modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarCarrito()">&times;</span>
+            <h2>Tu Carrito</h2>
+            <div id="carrito-items"></div>
+            <div class="carrito-total">
+                <h3>Total: $<span id="total-precio">0</span></h3>
+            </div>
+            <button class="btn" onclick="irAPago()" style="width: 100%; margin-top: 1rem;">💳 Ir a Pagar</button>
+        </div>
+    </div>
+
+    <!-- PAGO -->
+    <div class="modal" id="pago-modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarPago()">&times;</span>
+            <h2>💳 Forma de Pago</h2>
+            
+            <div class="pago-opciones">
+                <div class="opcion-pago">
+                    <h3>💰 Mercado Pago</h3>
+                    <p>Transfiere a través de tu alias:</p>
+                    <div class="alias-box">
+                        <span id="alias-mp">tomas.112504mp</span>
+                        <button onclick="copiarAlias()" class="btn-copiar">Copiar</button>
+                    </div>
+                    <p class="info-pago">Total: $<span id="total-pago">0</span></p>
+                    <button class="btn" onclick="seleccionarMetodoPago('mercadopago')" style="width: 100%; margin-top: 1rem;">✅ Seleccionar</button>
+                </div>
+
+                <div class="opcion-pago">
+                    <h3>🏦 Tarjeta de Débito</h3>
+                    <p>Se paga en la página segura de Mercado Pago (acepta débito de cualquier banco)</p>
+                    <p class="info-pago">Total: $<span id="total-tarjeta">0</span></p>
+                    <button class="btn" onclick="pagarConTarjeta()" style="width: 100%;">💳 Pagar con tarjeta</button>
+                </div>
+
+                <div class="opcion-pago">
+                    <h3>📱 WhatsApp</h3>
+                    <p>Confirma tu compra por aquí</p>
+                    <button class="btn" onclick="seleccionarMetodoPago('whatsapp')" style="width: 100%;">📲 Enviar por WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANIMACIÓN COMPRA -->
+    <div class="animacion-compra" id="animacion-compra">
+        <div class="aji-container">
+            <div class="aji">🌶️</div>
+            <div class="aji">🔥</div>
+            <div class="aji">🌶️</div>
+            <div class="aji">🔥</div>
+        </div>
+        <div class="mensaje-compra">¡COMPRA CONFIRMADA! 🎉</div>
+    </div>
+
+    <div class="lightbox" id="lightbox" onclick="cerrarImagen()"><img id="lightbox-img" src="" alt="Producto"></div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 JUGETONAS | Mayores de 18+ | <a href="#" style="color: #00ffff;">Política de Privacidad</a></p>
+    </footer>
+
+    <script src="config-nube.js"></script>
+    <script src="script.js"></script>
+    <script src="logo.js"></script>
+    <script src="ventas.js"></script>
+    <script src="nube.js"></script>
+</body>
+</html>
